@@ -1,0 +1,16 @@
+{
+  "name": "web-to-pdf",
+  "version": "1.0.0",
+  "description": "Create a PDF version of the specified document using a headless browser.",
+  "author": "Tuan Le",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "puppeteer": "^5.2.1",
+    "yargs": "^15.4.1"
+  },
+  "bin": {
+    "web-to-pdf": "bin/index.js"
+  }
+}
