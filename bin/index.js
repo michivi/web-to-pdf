@@ -4,12 +4,7 @@
 const chalk = require("chalk");
 const puppeteer = require("puppeteer");
 
-const convertMain = async ({ _: [cmd, url] }) => {
-  if (!url) {
-    console.log(chalk.red("Missing document URL."));
-    process.exit(1);
-  }
-
+const convertToPdf = async ({ url }) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(url, {
@@ -22,18 +17,49 @@ const convertMain = async ({ _: [cmd, url] }) => {
   await browser.close();
 };
 
+const convertMain = async ({ _: [cmd, path] }) => {
+  if (!path) {
+    console.log(chalk.red("Missing document path."));
+    process.exit(1);
+  }
+
+  const url = new URL(path, `file://${process.cwd()}/`).toString();
+
+  return await convertToPdf({ url });
+};
+
+const downloadMain = async ({ _: [cmd, url] }) => {
+  if (!url) {
+    console.log(chalk.red("Missing document URL."));
+    process.exit(1);
+  }
+
+  return await convertToPdf({ url });
+};
+
 require("yargs")
   .scriptName("web-to-pdf")
   .usage("$0 <cmd> [args]")
   .command(
     "convert",
-    "convert the Web document into PDF.",
+    "convert the local Web document into PDF.",
+    (yargs) => {
+      yargs.positional("path", {
+        type: "string",
+        describe: "Path of the document to convert ot PDF",
+      });
+    },
+    convertMain
+  )
+  .command(
+    "download",
+    "convert the remote Web document into PDF.",
     (yargs) => {
       yargs.positional("url", {
         type: "string",
         describe: "URL of the document to convert ot PDF",
       });
     },
-    convertMain
+    downloadMain
   )
   .help().argv;
